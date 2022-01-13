@@ -1,23 +1,23 @@
-# hipergator-targets-ssh
+# pax-targets-ssh
 
 <!-- badges: start -->
 
 <!-- badges: end -->
 
-This is a minimal example of a [`targets`](https://docs.ropensci.org/targets/) workflow that can run on [HiperGator](https://www.rc.ufl.edu/services/hipergator/) HPC using the [`clustermq`](https://mschubert.github.io/clustermq/) backend for paralellization. This is intended to be run **locally** in RStudio. For an alternative workflow that is run *on Hipergator* via the commandline, see [this repo](https://github.com/BrunaLab/hipergator-targets).
+This is a minimal example of a [`targets`](https://docs.ropensci.org/targets/) workflow that can run on the [Tufts University HPC](https://it.tufts.edu/high-performance-computing) using the [`clustermq`](https://mschubert.github.io/clustermq/) backend for paralellization. This is intended to be run **locally** in RStudio. For an alternative workflow that is run *on the HPC* via the commandline, see [this repo](https://github.com/BrunaLab/hipergator-targets).
 
 ## Setup
-0. All of this works best if you can SSH into HiperGator without a password.  Set this up with `ssh-keygen` and by creating a SSH config file locally (see details here: https://help.rc.ufl.edu/doc/Authentication_With_MFA)
-1. SSH into HiperGator.  Launch R and install the `clustermq` package. 
-2. On HiperGator, edit your `~/.Rprofile` (e.g. with `nano ~/.Rprofile`) to include:
+0. All of this works best if you can SSH into the cluster without a password.  You'll need to be on the Tufts VPN to avoid 2FA, and set up an SSH key with `ssh-keygen`.
+1. SSH into the cluster and start an interactive session with `srun -p interactive --pty bash`.  Launch R and install the `clustermq` package. 
+2. On the cluster, edit your `~/.Rprofile` (e.g. with `nano ~/.Rprofile`) to include:
 
 ```r
 options(
   clustermq.scheduler = "slurm",
-  cluster.template = "~/slurm_clustermq.tmpl"
+  clustermq.template = "~/slurm_clustermq.tmpl"
 )
 ```
-3. Edit the `slurm_clustermq.tmpl` file if needed (but don't touch the wildcards in double curly braces) and then copy it to HiperGator with `scp slurm_clustermq.tmpl username@hpg.rc.ufl.edu:slurm_clustermq.tmpl`
+3. Edit the `slurm_clustermq.tmpl` file if needed (but don't touch the wildcards in double curly braces) and then copy it to the cluster with `scp slurm_clustermq.tmpl username@xfer.cluster.tufts.edu:slurm_clustermq.tmpl`
 
 [More detailed instructions on setting up `clustermq`](https://mschubert.github.io/clustermq/articles/userguide.html)
 
@@ -35,9 +35,9 @@ Currently (as of 10-18-2021) there is a bug with R version 4.1+ on HiperGator th
 
 ## Troubleshooting:
 
-Problems with HiperGator: 
+Problems with Tufts cluster: 
 
-- https://help.rc.ufl.edu/doc/UFRC_Help_and_Documentation
+- https://it.tufts.edu/high-performance-computing/hpc-welcome-page
 
 Problems with `clustermq`:
 
@@ -49,7 +49,7 @@ Problems with `targets` (i.e. problem still exists with `tar_make()` instead of 
 
 ## How it works:
 
-Using `tar_make_clustermq()` sends necessary data to HiperGator via SSH and spawns worker jobs using the `slurm_clustermq.tmpl` file as a template for the SLURM submission scripts for each worker.
+Using `tar_make_clustermq()` sends necessary data to the cluster via SSH and spawns worker jobs using the `slurm_clustermq.tmpl` file as a template for the SLURM submission scripts for each worker.
 
 The parallelization happens at the level of targets.
 In this example, a list of numeric vectors is stored as `many_vects`.
